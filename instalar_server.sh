@@ -11,10 +11,6 @@ else
 	
 fi
 
-mkdir $1
-
-cd $1
-
 touch access.log
 
 touch error.log
