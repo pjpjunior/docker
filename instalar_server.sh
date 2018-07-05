@@ -29,7 +29,7 @@ EOF
 
 echo "Instalando nginx para" $1
 docker run --name nginx.$1 --network=web  -l traefik.frontend.rule=Host:$1 -v $PWD/html:/var/www/html:ro -v $PWD/default.conf:/etc/nginx/conf.d/default.conf -v $PWD/error.log:/var/log/nginx/error.log -d nginx
-echo "Instalando nginx para" $1
+echo "Instalando php 7.2 para" $1
 docker run --name php72.$1 --network=web  -v $PWD/html:/var/www/html:ro -d php:7.2-fpm-stretch
 
 
