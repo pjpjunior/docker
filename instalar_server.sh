@@ -53,8 +53,8 @@ server {
 }
 EOF
 
-
-#sed -i 's/localhost:9000/'$(docker ps -aqf 'name=php72.'$1)':9000/g' default.conf
+chmod 777 access.log default.conf error.log
+chmod 777 -R html
 
 sleep 3
 
