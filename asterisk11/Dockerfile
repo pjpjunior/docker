@@ -1,7 +1,8 @@
 FROM centos:7
 
 #docker build -t localhost/asterisk:11 .
-#docker run -it --name=asterisk11 -v /docker/asterisk11/etc/:/etc/asterisk/ localhost/asterisk:11
+#docker run -it --rm pjpjunior/asterisk:11
+#docker run -it --name=asterisk11 -p 5060:5060/udp -v /docker/asterisk11/etc/:/etc/asterisk/ pjpjunior/asterisk:11
 
 WORKDIR /etc/asterisk/
 
@@ -27,19 +28,20 @@ RUN yum update -y && yum install -y \
 RUN cd /usr/src/ && git clone -b 11 http://gerrit.asterisk.org/asterisk asterisk-11 \
 && cd asterisk-11 \
 && ./configure --libdir=/usr/lib64 \
+&& make menuselect.makeopts \
+&& menuselect/menuselect \
+  --disable BUILD_NATIVE \
+  --enable cdr_csv \
+  --enable chan_sip \
+  --enable res_snmp \
+  --enable res_http_websocket \
+  --enable res_hep_pjsip \
+  --enable res_hep_rtcp \
+  menuselect.makeopts \
 && make \
 && make install \
 && make samples \
-&& make config \
 && make clean \
-&& make distclean \
-&& useradd -m asterisk -s /sbin/nologin \
-&& chown -R asterisk:asterisk /var/lib/asterisk/ \
-&& chown -R asterisk:asterisk /var/spool/asterisk/ \
-&& chown -R asterisk:asterisk /var/log/asterisk/ \
-&& chown -R asterisk:asterisk /var/run/asterisk/ \
-&& chown -R asterisk:asterisk /usr/sbin/asterisk \
-&& chown -R asterisk:asterisk /var/lib/asterisk/sounds/ \
-&& chown -R asterisk:asterisk /etc/asterisk
+&& make distclean 
 
-CMD /usr/sbin/asterisk -f -U asterisk -G asterisk -vvvg -c
+CMD asterisk -fvvvv
