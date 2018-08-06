@@ -41,7 +41,4 @@ RUN cd /usr/src/ && git clone -b 11 http://gerrit.asterisk.org/asterisk asterisk
 && chown -R asterisk:asterisk /var/lib/asterisk/sounds/ \
 && chown -R asterisk:asterisk /etc/asterisk
 
-
-ENTRYPOINT ["/usr/sbin/asterisk -f -U asterisk -G asterisk -vvvg -c"]
-
 CMD /usr/sbin/asterisk -f -U asterisk -G asterisk -vvvg -c
