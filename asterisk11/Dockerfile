@@ -30,6 +30,7 @@ RUN cd /usr/src/ && git clone -b 11 http://gerrit.asterisk.org/asterisk asterisk
 && make \
 && make install \
 && make samples \
+&& make config \
 && make clean \
 && make distclean \
 && useradd -m asterisk -s /sbin/nologin \
