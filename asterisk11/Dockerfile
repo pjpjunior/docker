@@ -45,6 +45,13 @@ RUN cd /usr/src/ && git clone -b 11 http://gerrit.asterisk.org/asterisk asterisk
 && make samples \
 && make clean \
 && make distclean \
-&& useradd -m asterisk -s /sbin/nologin
-
+&& useradd -m asterisk -s /sbin/nologin \
+&& chown -R asterisk:asterisk /var/lib/asterisk/ \
+&& chown -R asterisk:asterisk /var/spool/asterisk/ \
+&& chown -R asterisk:asterisk /var/log/asterisk/ \
+&& chown -R asterisk:asterisk /var/run/asterisk/ \
+&& chown -R asterisk:asterisk /usr/sbin/asterisk \
+&& chown -R asterisk:asterisk /var/lib/asterisk/sounds/ \
+&& chown -R asterisk:asterisk /etc/asterisk/
+/
 CMD asterisk -fvvvv
