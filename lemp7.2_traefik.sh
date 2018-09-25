@@ -43,7 +43,7 @@ server {
     location ~ \.php$ {
         try_files \$uri = 404;
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass php70.$1:9000;
+        fastcgi_pass php72.$1:9000;
         fastcgi_index index.php;
 	fastcgi_read_timeout 1800; 
         include fastcgi_params;
@@ -66,10 +66,10 @@ docker run --name nginx.$1 --network=intranet --restart unless-stopped -l traefi
 
 echo "Instalando php 7.2 para" $1
 
-docker run --name php70.$1 --network=intranet --restart always -l traefik.enable=false -v $PWD/html:/var/www/html -d php:7.2-fpm-stretch
+docker run --name php72.$1 --network=intranet --restart always -l traefik.enable=false -v $PWD/html:/var/www/html -d php:7.2-fpm-stretch
 
-docker exec -it php70.$1 sh -c 'apt-get update && apt-get install -y zlib1g-dev libmcrypt-dev libc-client-dev libkrb5-dev libpng-dev && rm -r /var/lib/apt/lists/*'
-docker exec -it php70.$1 sh -c 'docker-php-ext-configure imap --with-kerberos --with-imap-ssl && docker-php-ext-install imap zip mysqli mbstring gd mcrypt'
+docker exec -it php72.$1 sh -c 'apt-get update && apt-get install -y zlib1g-dev libmcrypt-dev libc-client-dev libkrb5-dev libpng-dev && rm -r /var/lib/apt/lists/*'
+docker exec -it php72.$1 sh -c 'docker-php-ext-configure imap --with-kerberos --with-imap-ssl && docker-php-ext-install imap zip mysqli mbstring gd mcrypt'
 
 
 
