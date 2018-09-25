@@ -73,9 +73,7 @@ docker exec -it php72.$1 sh -c 'docker-php-ext-configure imap --with-kerberos --
 
 
 
-docker exec -it php70.$1 sh -c 'echo "short_open_tag = off;" >> /usr/local/etc/php/php.ini && echo "upload_max_filesize = 10M;" >> /usr/local/etc/php/php.ini && echo "post_max_size = 10M;" >> /usr/local/etc/php/php.ini'
-
-#docker exec -it php70.teste sh -c 'echo "short_open_tag = off;" >> /usr/local/etc/php/php.ini && echo "upload_max_filesize = 10M;" >> /usr/local/etc/php/php.ini && echo "post_max_size = 10M;" >> /usr/local/etc/php/php.ini'
+docker exec -it php72.$1 sh -c 'echo "short_open_tag = off;" >> /usr/local/etc/php/php.ini && echo "upload_max_filesize = 10M;" >> /usr/local/etc/php/php.ini && echo "post_max_size = 10M;" >> /usr/local/etc/php/php.ini'
 
 echo "Instalando mariadb para" $1
 docker run --name mariadb.$1 --network=intranet --restart always -l traefik.enable=false -v $PWD/datadir:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=$1 -d mariadb --sql-mode="ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
