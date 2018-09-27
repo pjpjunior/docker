@@ -36,12 +36,13 @@ server {
     listen 80;
     server_name  localhost;
     index index.php index.html;
+    try_files \$uri \$uri/ /index.php?\$args;
     error_log  /var/log/nginx/error.log;
     access_log /var/log/nginx/access.log;
     root /var/www/html;
 
     location ~ \.php$ {
-        try_files \$uri = 404;
+        try_files \$uri \$uri/ /index.php?\$args;
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
         fastcgi_pass php72.$1:9000;
         fastcgi_index index.php;
@@ -68,18 +69,20 @@ echo "Instalando php 7.2 para" $1
 
 docker run --name php72.$1 --network=intranet --restart always -l traefik.enable=false -v $PWD/html:/var/www/html -d php:7.2-fpm-stretch
 
-docker exec -it php72.$1 sh -c 'apt-get update && apt-get install -y zlib1g-dev libmcrypt-dev libc-client-dev libkrb5-dev libpng-dev && rm -r /var/lib/apt/lists/*'
-docker exec -it php72.$1 sh -c 'docker-php-ext-configure imap --with-kerberos --with-imap-ssl && docker-php-ext-install imap zip mysqli mbstring gd mcrypt'
+docker exec -it php72.$1 sh -c 'apt-get update && apt-get install -y zlib1g-dev libc-client-dev libkrb5-dev libpng-dev libjpeg-dev && rm -r /var/lib/apt/lists/*'
+docker exec -it php72.$1 sh -c 'docker-php-ext-configure imap --with-kerberos --with-imap-ssl && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr && docker-php-ext-install imap zip mysqli mbstring gd opcache exif'
+
+
+docker exec -it php72.$1 sh -c " { echo 'short_open_tag = off;' ; echo 'upload_max_filesize = 10M;' ; echo 'post_max_size = 10M;';} >> /usr/local/etc/php/php.ini && { echo 'opcache.memory_consumption=128'; echo 'opcache.interned_strings_buffer=8'; echo 'opcache.max_accelerated_files=4000'; echo 'opcache.revalidate_freq=2'; echo 'opcache.fast_shutdown=1'; echo 'opcache.enable_cli=1'; } >> /usr/local/etc/php/conf.d/opcache-recommended.ini"
 
 
 
-docker exec -it php72.$1 sh -c 'echo "short_open_tag = off;" >> /usr/local/etc/php/php.ini && echo "upload_max_filesize = 10M;" >> /usr/local/etc/php/php.ini && echo "post_max_size = 10M;" >> /usr/local/etc/php/php.ini'
 
 echo "Instalando mariadb para" $1
-docker run --name mariadb.$1 --network=intranet --restart always -l traefik.enable=false -v $PWD/datadir:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=$1 -d mariadb --sql-mode="ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+docker run --name mariadb.$1 --network=intranet --restart always -l traefik.enable=false -v $PWD/datadir:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=$1 -e MYSQL_DATABASE=wordpress -d mariadb --sql-mode="ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
 
 echo "Instalando phpmyadmin para" $1
-docker run --name phpmyadmin.$1 --network=intranet -l traefik.enable=false -d -e PMA_HOST=mariadb.$1  phpmyadmin/phpmyadmin
+docker run --name phpmyadmin.$1 --network=intranet -p 81:80 -l traefik.enable=false -d -e PMA_HOST=mariadb.$1  phpmyadmin/phpmyadmin
 
 
 docker network connect web nginx.$1
